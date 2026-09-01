@@ -138,3 +138,95 @@ footer {
         grid-template-columns: 1fr;
     }
 }
+/* Registration and login page */
+.form-section {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    min-height: 75vh;
+    padding: 50px 20px;
+}
+
+.form-card {
+    background-color: white;
+    border-radius: 14px;
+    max-width: 480px;
+    padding: 38px;
+    width: 100%;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.form-card h1 {
+    font-size: 34px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.form-description {
+    color: #687083;
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.form-group input {
+    border: 1px solid #ccd1dc;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 12px;
+    width: 100%;
+}
+
+.form-group input:focus {
+    border-color: #5b4bdb;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(91, 75, 219, 0.12);
+}
+
+.form-button {
+    background-color: #5b4bdb;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 13px;
+    width: 100%;
+}
+
+.form-button:hover {
+    background-color: #4939c6;
+}
+
+.form-footer {
+    margin-top: 22px;
+    text-align: center;
+}
+
+.form-footer a {
+    color: #5b4bdb;
+}
+
+.message {
+    background-color: #ffe6e6;
+    border: 1px solid #e8a2a2;
+    border-radius: 7px;
+    color: #a22323;
+    margin-bottom: 20px;
+    padding: 11px;
+}
+
+.message.success {
+    background-color: #e5f8eb;
+    border-color: #94d5a8;
+    color: #246e39;
+}

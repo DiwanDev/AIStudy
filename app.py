@@ -2,8 +2,8 @@ import os
 
 import mysql.connector
 from dotenv import load_dotenv
-from flask import Flask, render_template
-
+from flask import Flask, render_template, request
+from werkzeug.security import generate_password_hash
 
 # Load values from the .env file
 load_dotenv()
@@ -36,31 +36,136 @@ def home():
     return render_template("home.html")
 
 
-# Database-test route
-@app.route("/test-db")
-def test_db():
+@app.route("/register", methods=["GET", "POST"])
+def register():
 
-    # Create a cursor for executing SQL
-    cursor = db.cursor()
+    if request.method == "POST":
 
-    # Ask MySQL for the currently selected database
-    cursor.execute(
-        """
-        SELECT DATABASE()
-        """
-    )
+        name = request.form.get(
+            "name",
+            "",
+        ).strip()
 
-    # Get one result
-    result = cursor.fetchone()
+        email = request.form.get(
+            "email",
+            "",
+        ).strip().lower()
 
-    # Close the cursor
-    cursor.close()
+        password = request.form.get(
+            "password",
+            "",
+        )
 
-    # Display the database name in the browser
-    return (
-        "Successfully connected to database: "
-        + result[0]
-    )
+        confirm_password = request.form.get(
+            "confirm_password",
+            "",
+        )
+
+        if not name:
+
+            return render_template(
+                "register.html",
+                message="Name is required.",
+                name=name,
+                email=email,
+            )
+
+        if not email:
+
+            return render_template(
+                "register.html",
+                message="Email is required.",
+                name=name,
+                email=email,
+            )
+
+        if not password:
+
+            return render_template(
+                "register.html",
+                message="Password is required.",
+                name=name,
+                email=email,
+            )
+
+        if len(password) < 6:
+
+            return render_template(
+                "register.html",
+                message=(
+                    "Password must contain at least "
+                    "6 characters."
+                ),
+                name=name,
+                email=email,
+            )
+
+        if password != confirm_password:
+
+            return render_template(
+                "register.html",
+                message="Passwords do not match.",
+                name=name,
+                email=email,
+            )
+
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT id
+            FROM users
+            WHERE email = %s
+            """,
+            (email,),
+        )
+
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+
+            cursor.close()
+
+            return render_template(
+                "register.html",
+                message="This email is already registered.",
+                name=name,
+                email=email,
+            )
+
+        password_hash = generate_password_hash(
+            password
+        )
+
+        cursor.execute(
+            """
+            INSERT INTO users (
+                name,
+                email,
+                password_hash
+            )
+            VALUES (%s, %s, %s)
+            """,
+            (
+                name,
+                email,
+                password_hash,
+            ),
+        )
+
+        db.commit()
+        cursor.close()
+
+        return render_template(
+            "register.html",
+            message=(
+                "Account created successfully. "
+                "You can now log in."
+            ),
+            success=True,
+        )
+
+    return render_template("register.html")
 
 
 # Start the Flask development server
