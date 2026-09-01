@@ -230,3 +230,80 @@ footer {
     border-color: #94d5a8;
     color: #246e39;
 }
+/* Logout form inside navigation */
+.logout-form {
+    margin: 0;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: #30384b;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.logout-button:hover {
+    color: #5b4bdb;
+}
+
+/* Dashboard */
+.dashboard-section {
+    min-height: 75vh;
+    padding: 60px 8%;
+}
+
+.dashboard-header {
+    margin-bottom: 38px;
+}
+
+.dashboard-header h1 {
+    margin-bottom: 10px;
+}
+
+.dashboard-grid {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.dashboard-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-card h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+}
+
+.dashboard-number {
+    color: #5b4bdb;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+@media (max-width: 750px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.logout-form {
+    margin: 0;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: #30384b;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.logout-button:hover {
+    color: #5b4bdb;
+}

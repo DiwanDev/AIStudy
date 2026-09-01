@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Login | AIStudy
+{% endblock %}
+
+
+{% block content %}
+
+<section class="form-section">
+
+    <div class="form-card">
+
+        <h1>Welcome Back</h1>
+
+        <p class="form-description">
+            Log in to continue studying with AIStudy.
+        </p>
+
+        {% if message %}
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+        {% endif %}
+
+        <form method="POST"
+              action="{{ url_for('login') }}">
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    value="{{ email or '' }}"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+            </div>
+
+            <button type="submit" class="form-button">
+                Login
+            </button>
+
+        </form>
+
+        <p class="form-footer">
+            Do not have an account?
+
+            <a href="{{ url_for('register') }}">
+                Create Account
+            </a>
+        </p>
+
+    </div>
+
+</section>
+
+{% endblock %}

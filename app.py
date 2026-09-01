@@ -2,16 +2,25 @@ import os
 
 import mysql.connector
 from dotenv import load_dotenv
-from flask import Flask, render_template, request
-from werkzeug.security import generate_password_hash
-
+from flask import (
+    Flask,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from werkzeug.security import (
+    check_password_hash,
+    generate_password_hash,
+)
 # Load values from the .env file
 load_dotenv()
 
 
 # Create the Flask application
 app = Flask(__name__)
-
+app.secret_key = os.getenv("SECRET_KEY")
 
 # Connect Flask/Python to MySQL
 db = mysql.connector.connect(
@@ -35,7 +44,109 @@ def home():
 
     return render_template("home.html")
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
 
+    if "user_id" in session:
+        return redirect(url_for("dashboard"))
+
+    if request.method == "POST":
+
+        email = request.form.get(
+            "email",
+            "",
+        ).strip().lower()
+
+        password = request.form.get(
+            "password",
+            "",
+        )
+
+        if not email or not password:
+
+            return render_template(
+                "login.html",
+                message="Email and password are required.",
+                email=email,
+            )
+
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                name,
+                email,
+                password_hash
+            FROM users
+            WHERE email = %s
+            """,
+            (email,),
+        )
+
+        user = cursor.fetchone()
+
+        cursor.close()
+
+        if user and check_password_hash(
+            user["password_hash"],
+            password,
+        ):
+
+            session["user_id"] = user["id"]
+            session["user_name"] = user["name"]
+
+            return redirect(url_for("dashboard"))
+
+        return render_template(
+            "login.html",
+            message="Invalid email or password.",
+            email=email,
+        )
+
+    return render_template("login.html")
+@app.route("/dashboard")
+def dashboard():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            name,
+            email,
+            created_at
+        FROM users
+        WHERE id = %s
+        """,
+        (session["user_id"],),
+    )
+
+    user = cursor.fetchone()
+
+    cursor.close()
+
+    if user is None:
+
+        session.clear()
+
+        return redirect(url_for("login"))
+
+    return render_template(
+        "dashboard.html",
+        user=user,
+    )
+@app.route("/logout", methods=["POST"])
+def logout():
+
+    session.clear()
+
+    return redirect(url_for("home"))
 @app.route("/register", methods=["GET", "POST"])
 def register():
 

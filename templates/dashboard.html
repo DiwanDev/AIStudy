@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Dashboard | AIStudy
+{% endblock %}
+
+
+{% block content %}
+
+<section class="dashboard-section">
+
+    <div class="dashboard-header">
+
+        <p class="label">Student Dashboard</p>
+
+        <h1>
+            Welcome, {{ user.name }}
+        </h1>
+
+        <p>
+            You are logged in as {{ user.email }}.
+        </p>
+
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-card">
+
+            <h2>Documents</h2>
+
+            <p class="dashboard-number">
+                0
+            </p>
+
+            <p>
+                Upload your first study document.
+            </p>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h2>Quizzes</h2>
+
+            <p class="dashboard-number">
+                0
+            </p>
+
+            <p>
+                Your generated quizzes will appear here.
+            </p>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h2>Average Score</h2>
+
+            <p class="dashboard-number">
+                0%
+            </p>
+
+            <p>
+                Complete quizzes to track your progress.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
