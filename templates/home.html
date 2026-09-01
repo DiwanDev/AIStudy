@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home | AIStudy
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <p class="label">Your AI learning assistant</p>
+
+        <h1>Study smarter with your own notes.</h1>
+
+        <p class="description">
+            Upload your study material, create summaries,
+            ask questions and practise quizzes.
+        </p>
+
+        <div class="buttons">
+            <a href="#" class="primary-button">
+                Get Started
+            </a>
+
+            <a href="#features" class="secondary-button">
+                View Features
+            </a>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="features" id="features">
+
+    <h2>AIStudy Features</h2>
+
+    <div class="feature-grid">
+
+        <div class="feature-card">
+            <h3>Upload Notes</h3>
+            <p>Upload and manage your PDF or text notes.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Generate Summaries</h3>
+            <p>Create simple summaries from study material.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Take Quizzes</h3>
+            <p>Generate questions and save your scores.</p>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
