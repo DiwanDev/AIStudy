@@ -307,3 +307,69 @@ footer {
 .logout-button:hover {
     color: #5b4bdb;
 }
+/* Documents page */
+.documents-section {
+    min-height: 75vh;
+    padding: 60px 8%;
+}
+
+.documents-header {
+    margin-bottom: 30px;
+}
+
+.upload-card {
+    background-color: white;
+    border-radius: 12px;
+    margin-bottom: 35px;
+    max-width: 650px;
+    padding: 28px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+}
+
+.upload-card h2 {
+    margin-bottom: 20px;
+}
+
+.document-list h2 {
+    margin-bottom: 20px;
+}
+
+.document-card {
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 20px;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.05);
+}
+
+.document-card h3 {
+    color: #5b4bdb;
+    margin-bottom: 7px;
+}
+
+.document-card p {
+    color: #687083;
+    font-size: 14px;
+}
+
+.empty-state {
+    background-color: white;
+    border-radius: 10px;
+    color: #687083;
+    padding: 30px;
+    text-align: center;
+}
+.card-link {
+    color: #5b4bdb;
+    display: inline-block;
+    font-weight: bold;
+    margin-top: 14px;
+    text-decoration: none;
+}
+
+.card-link:hover {
+    text-decoration: underline;
+}

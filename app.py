@@ -1,4 +1,5 @@
 import os
+import uuid
 
 import mysql.connector
 from dotenv import load_dotenv
@@ -14,14 +15,37 @@ from werkzeug.security import (
     check_password_hash,
     generate_password_hash,
 )
+from werkzeug.utils import secure_filename
 # Load values from the .env file
 load_dotenv()
 
 
 # Create the Flask application
 app = Flask(__name__)
+
 app.secret_key = os.getenv("SECRET_KEY")
 
+
+if not app.secret_key:
+    raise RuntimeError(
+        "SECRET_KEY is missing from the .env file."
+    )
+
+
+app.config["UPLOAD_FOLDER"] = os.path.join(
+    app.root_path,
+    "uploads",
+)
+
+app.config["MAX_CONTENT_LENGTH"] = (
+    10 * 1024 * 1024
+)
+
+
+os.makedirs(
+    app.config["UPLOAD_FOLDER"],
+    exist_ok=True,
+)
 # Connect Flask/Python to MySQL
 db = mysql.connector.connect(
     host="localhost",
@@ -36,7 +60,21 @@ if db.is_connected():
     app.logger.info(
         "Connected to AIStudy MySQL database!"
     )
+# File extensions accepted by AIStudy
+ALLOWED_EXTENSIONS = {
+    "pdf",
+    "txt",
+}
 
+
+# Check whether an uploaded file has an allowed extension
+def allowed_file(filename):
+
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower()
+        in ALLOWED_EXTENSIONS
+    )
 
 # Home-page route
 @app.route("/")
@@ -147,6 +185,149 @@ def logout():
     session.clear()
 
     return redirect(url_for("home"))
+@app.route(
+    "/documents",
+    methods=["GET", "POST"],
+)
+def documents():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+    message = None
+    success = False
+
+    if request.method == "POST":
+
+        uploaded_file = request.files.get(
+            "document"
+        )
+
+        if not uploaded_file:
+
+            message = "Please choose a file."
+
+        elif uploaded_file.filename == "":
+
+            message = "Please choose a file."
+
+        elif not allowed_file(
+            uploaded_file.filename
+        ):
+
+            message = (
+                "Only PDF and TXT files are allowed."
+            )
+
+        else:
+
+            original_filename = secure_filename(
+                uploaded_file.filename
+            )
+
+            extension = original_filename.rsplit(
+                ".",
+                1,
+            )[1].lower()
+
+            stored_filename = (
+                uuid.uuid4().hex
+                + "."
+                + extension
+            )
+
+            file_path = os.path.join(
+                app.config["UPLOAD_FOLDER"],
+                stored_filename,
+            )
+
+            uploaded_file.save(
+                file_path
+            )
+
+            file_size = os.path.getsize(
+                file_path
+            )
+
+            cursor = db.cursor()
+
+            try:
+
+                cursor.execute(
+                    """
+                    INSERT INTO documents (
+                        user_id,
+                        original_filename,
+                        stored_filename,
+                        file_type,
+                        file_size
+                    )
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (
+                        session["user_id"],
+                        original_filename,
+                        stored_filename,
+                        extension,
+                        file_size,
+                    ),
+                )
+
+                db.commit()
+
+                message = (
+                    "Document uploaded successfully."
+                )
+
+                success = True
+
+            except mysql.connector.Error:
+
+                db.rollback()
+
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+                message = (
+                    "The document could not be saved."
+                )
+
+            finally:
+
+                cursor.close()
+
+    cursor = db.cursor(
+        dictionary=True
+    )
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            original_filename,
+            file_type,
+            file_size,
+            uploaded_at
+        FROM documents
+        WHERE user_id = %s
+        ORDER BY uploaded_at DESC
+        """,
+        (session["user_id"],),
+    )
+
+    documents_data = cursor.fetchall()
+
+    cursor.close()
+
+    return render_template(
+        "documents.html",
+        documents=documents_data,
+        message=message,
+        success=success,
+    )
 @app.route("/register", methods=["GET", "POST"])
 def register():
 

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+My Documents | AIStudy
+{% endblock %}
+
+
+{% block content %}
+
+<section class="documents-section">
+
+    <div class="documents-header">
+
+        <div>
+
+            <p class="label">
+                Study Material
+            </p>
+
+            <h1>
+                My Documents
+            </h1>
+
+            <p>
+                Upload PDF or TXT study material.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="upload-card">
+
+        <h2>
+            Upload Document
+        </h2>
+
+        {% if message %}
+
+            <div class="message {% if success %}success{% endif %}">
+                {{ message }}
+            </div>
+
+        {% endif %}
+
+        <form
+            method="POST"
+            action="{{ url_for('documents') }}"
+            enctype="multipart/form-data"
+        >
+
+            <div class="form-group">
+
+                <label for="document">
+                    Choose PDF or TXT file
+                </label>
+
+                <input
+                    type="file"
+                    id="document"
+                    name="document"
+                    accept=".pdf,.txt,application/pdf,text/plain"
+                    required
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="form-button"
+            >
+                Upload Document
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="document-list">
+
+        <h2>
+            Uploaded Documents
+        </h2>
+
+        {% if documents %}
+
+            {% for document in documents %}
+
+                <div class="document-card">
+
+                    <div>
+
+                        <h3>
+                            {{ document.original_filename }}
+                        </h3>
+
+                        <p>
+                            Type:
+                            {{ document.file_type.upper() }}
+                        </p>
+
+                        <p>
+                            Size:
+                            {{ document.file_size }} bytes
+                        </p>
+
+                        <p>
+                            Uploaded:
+                            {{ document.uploaded_at }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <p>
+                    You have not uploaded any documents.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}
