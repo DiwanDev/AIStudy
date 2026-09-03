@@ -356,7 +356,7 @@ footer {
 }
 
 .empty-state {
-    background-color: white;
+    background-color: gray;
     border-radius: 10px;
     color: #687083;
     padding: 30px;
