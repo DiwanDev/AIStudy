@@ -363,9 +363,9 @@ footer {
     text-align: center;
 }
 .card-link {
-    color: #5b4bdb;
+    color: #0e0931;
     display: inline-block;
-    font-weight: bold;
+    font-weight: italic;
     margin-top: 14px;
     text-decoration: none;
 }
