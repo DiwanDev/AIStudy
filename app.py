@@ -3,18 +3,24 @@ import uuid
 
 import mysql.connector
 from dotenv import load_dotenv
+
 from flask import (
     Flask,
+    abort,
+    flash,
     redirect,
     render_template,
     request,
+    send_from_directory,
     session,
     url_for,
 )
+
 from werkzeug.security import (
     check_password_hash,
     generate_password_hash,
 )
+
 from werkzeug.utils import secure_filename
 # Load values from the .env file
 load_dotenv()
@@ -327,6 +333,147 @@ def documents():
         documents=documents_data,
         message=message,
         success=success,
+    )
+@app.route(
+    "/documents/<int:document_id>/download"
+)
+def download_document(document_id):
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+    cursor = db.cursor(
+        dictionary=True
+    )
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            original_filename,
+            stored_filename
+        FROM documents
+        WHERE id = %s
+        AND user_id = %s
+        """,
+        (
+            document_id,
+            session["user_id"],
+        ),
+    )
+
+    document = cursor.fetchone()
+
+    cursor.close()
+
+    if document is None:
+        abort(404)
+
+    file_path = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        document["stored_filename"],
+    )
+
+    if not os.path.exists(file_path):
+        abort(404)
+
+    return send_from_directory(
+        app.config["UPLOAD_FOLDER"],
+        document["stored_filename"],
+        as_attachment=True,
+        download_name=document[
+            "original_filename"
+        ],
+    )
+@app.route(
+    "/documents/<int:document_id>/delete",
+    methods=["POST"],
+)
+def delete_document(document_id):
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+    cursor = db.cursor(
+        dictionary=True
+    )
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            stored_filename
+        FROM documents
+        WHERE id = %s
+        AND user_id = %s
+        """,
+        (
+            document_id,
+            session["user_id"],
+        ),
+    )
+
+    document = cursor.fetchone()
+
+    if document is None:
+
+        cursor.close()
+
+        abort(404)
+
+    file_path = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        document["stored_filename"],
+    )
+
+    try:
+
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        cursor.execute(
+            """
+            DELETE FROM documents
+            WHERE id = %s
+            AND user_id = %s
+            """,
+            (
+                document_id,
+                session["user_id"],
+            ),
+        )
+
+        db.commit()
+
+        flash(
+            "Document deleted successfully.",
+            "success",
+        )
+
+    except (
+        OSError,
+        mysql.connector.Error,
+    ):
+
+        db.rollback()
+
+        flash(
+            "The document could not be deleted.",
+            "error",
+        )
+
+    finally:
+
+        cursor.close()
+
+    return redirect(
+        url_for("documents")
     )
 @app.route("/register", methods=["GET", "POST"])
 def register():

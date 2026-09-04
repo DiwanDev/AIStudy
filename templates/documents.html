@@ -1,75 +1,56 @@
 {% extends "base.html" %}
 
-
-{% block title %}
-My Documents | AIStudy
-{% endblock %}
-
+{% block title %}My Documents | AIStudy{% endblock %}
 
 {% block content %}
 
 <section class="documents-section">
 
-    <div class="documents-header">
+    <h1>My Documents</h1>
 
-        <div>
+    <p>Upload and manage your study documents.</p>
 
-            <p class="label">
-                Study Material
-            </p>
 
-            <h1>
-                My Documents
-            </h1>
+    <!-- Display Flask flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
 
-            <p>
-                Upload PDF or TXT study material.
-            </p>
+        {% if messages %}
 
-        </div>
+            {% for category, message in messages %}
 
-    </div>
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
 
-    <div class="upload-card">
-
-        <h2>
-            Upload Document
-        </h2>
-
-        {% if message %}
-
-            <div class="message {% if success %}success{% endif %}">
-                {{ message }}
-            </div>
+            {% endfor %}
 
         {% endif %}
 
+    {% endwith %}
+
+
+    <!-- Upload form -->
+    <div class="upload-card">
+
+        <h2>Upload a document</h2>
+
         <form
-            method="POST"
             action="{{ url_for('documents') }}"
+            method="POST"
             enctype="multipart/form-data"
         >
 
-            <div class="form-group">
+            <label for="document">Choose PDF or TXT file</label>
 
-                <label for="document">
-                    Choose PDF or TXT file
-                </label>
-
-                <input
-                    type="file"
-                    id="document"
-                    name="document"
-                    accept=".pdf,.txt,application/pdf,text/plain"
-                    required
-                >
-
-            </div>
-
-            <button
-                type="submit"
-                class="form-button"
+            <input
+                type="file"
+                id="document"
+                name="document"
+                accept=".pdf,.txt"
+                required
             >
+
+            <button type="submit">
                 Upload Document
             </button>
 
@@ -77,11 +58,11 @@ My Documents | AIStudy
 
     </div>
 
+
+    <!-- Uploaded document list -->
     <div class="document-list">
 
-        <h2>
-            Uploaded Documents
-        </h2>
+        <h2>Your uploaded documents</h2>
 
         {% if documents %}
 
@@ -89,26 +70,48 @@ My Documents | AIStudy
 
                 <div class="document-card">
 
-                    <div>
+                    <div class="document-information">
 
                         <h3>
                             {{ document.original_filename }}
                         </h3>
 
                         <p>
-                            Type:
-                            {{ document.file_type.upper() }}
+                            Uploaded: {{ document.uploaded_at }}
                         </p>
 
-                        <p>
-                            Size:
-                            {{ document.file_size }} bytes
-                        </p>
+                    </div>
 
-                        <p>
-                            Uploaded:
-                            {{ document.uploaded_at }}
-                        </p>
+
+                    <div class="document-actions">
+
+                        <a
+                            href="{{ url_for(
+                                'download_document',
+                                document_id=document.id
+                            ) }}"
+                            class="button download-button"
+                        >
+                            Download
+                        </a>
+
+                        <form
+                            action="{{ url_for(
+                                'delete_document',
+                                document_id=document.id
+                            ) }}"
+                            method="POST"
+                        >
+                            <button
+                                type="submit"
+                                class="delete-button"
+                                onclick="return confirm(
+                                    'Are you sure you want to delete this document?'
+                                )"
+                            >
+                                Delete
+                            </button>
+                        </form>
 
                     </div>
 
@@ -118,13 +121,7 @@ My Documents | AIStudy
 
         {% else %}
 
-            <div class="empty-state">
-
-                <p>
-                    You have not uploaded any documents.
-                </p>
-
-            </div>
+            <p>You have not uploaded any documents yet.</p>
 
         {% endif %}
 

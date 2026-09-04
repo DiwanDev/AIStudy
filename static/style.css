@@ -356,7 +356,7 @@ footer {
 }
 
 .empty-state {
-    background-color: gray;
+    background-color: white;
     border-radius: 10px;
     color: #687083;
     padding: 30px;
@@ -372,4 +372,52 @@ footer {
 
 .card-link:hover {
     text-decoration: underline;
+}
+/* Document action buttons */
+.document-actions {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+}
+
+.document-actions form {
+    margin: 0;
+}
+
+.download-button,
+.delete-button {
+    border-radius: 7px;
+    cursor: pointer;
+    display: inline-block;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 9px 14px;
+    text-decoration: none;
+}
+
+.download-button {
+    background-color: #5b4bdb;
+    border: 1px solid #5b4bdb;
+    color: white;
+}
+
+.download-button:hover {
+    background-color: #4939c6;
+}
+
+.delete-button {
+    background-color: white;
+    border: 1px solid #d64545;
+    color: #d64545;
+}
+
+.delete-button:hover {
+    background-color: #d64545;
+    color: white;
+}
+
+.message.error {
+    background-color: #ffe6e6;
+    border-color: #e8a2a2;
+    color: #a22323;
 }
