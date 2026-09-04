@@ -71,15 +71,29 @@ Dashboard | AIStudy
                         </p>
                     </div>
 
-                    <a
-                        href="{{ url_for(
-                            'download_document',
-                            document_id=document.id
-                        ) }}"
-                        class="small-button"
-                    >
-                        Download
-                    </a>
+                    <div class="recent-document-actions">
+
+    <a
+        href="{{ url_for(
+            'view_document',
+            document_id=document.id
+        ) }}"
+        class="view-button"
+    >
+        View Text
+    </a>
+
+    <a
+        href="{{ url_for(
+            'download_document',
+            document_id=document.id
+        ) }}"
+        class="small-button"
+    >
+        Download
+    </a>
+
+</div>
 
                 </div>
 

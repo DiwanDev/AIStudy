@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ document.original_filename }} | AIStudy
+{% endblock %}
+
+
+{% block content %}
+
+<section class="document-detail-section">
+
+    <div class="document-detail-heading">
+
+        <div>
+            <h1>{{ document.original_filename }}</h1>
+
+            <p>
+                File type: {{ document.file_type | upper }}
+            </p>
+
+            <p>
+                Uploaded: {{ document.uploaded_at }}
+            </p>
+        </div>
+
+
+        <div class="document-detail-actions">
+
+            <a
+                href="{{ url_for('documents') }}"
+                class="secondary-button"
+            >
+                Back to Documents
+            </a>
+
+            <a
+                href="{{ url_for(
+                    'download_document',
+                    document_id=document.id
+                ) }}"
+                class="primary-button"
+            >
+                Download
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="extracted-text-card">
+
+        <h2>Extracted Text</h2>
+
+        {% if extracted_text %}
+
+            <div class="extracted-text">
+                {{ extracted_text }}
+            </div>
+
+        {% else %}
+
+            <div class="empty-message">
+
+                <p>
+                    No readable text was found.
+                </p>
+
+                <p>
+                    This PDF may contain scanned images
+                    instead of selectable text.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

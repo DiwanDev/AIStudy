@@ -1,6 +1,7 @@
 import os
 import uuid
-
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 import mysql.connector
 from dotenv import load_dotenv
 
@@ -82,6 +83,109 @@ def allowed_file(filename):
         in ALLOWED_EXTENSIONS
     )
 
+def extract_document_text(file_path, file_type):
+
+    # Read a normal text file
+    if file_type == "txt":
+
+        with open(
+            file_path,
+            "r",
+            encoding="utf-8",
+            errors="replace",
+        ) as text_file:
+
+            return text_file.read()
+
+    # Read a PDF file
+    if file_type == "pdf":
+
+        pdf_reader = PdfReader(file_path)
+
+        extracted_pages = []
+
+        # Read a maximum of 20 pages for now
+        for page in pdf_reader.pages[:20]:
+
+            page_text = page.extract_text()
+
+            if page_text:
+                extracted_pages.append(page_text)
+
+        return "\n\n".join(extracted_pages)
+
+    return ""
+@app.route("/documents/<int:document_id>/view")
+def view_document(document_id):
+
+    # Protect the page from users who are not logged in
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
+
+    cursor = db.cursor(dictionary=True)
+
+    # Find the document, but only if it belongs to this user
+    cursor.execute(
+        """
+        SELECT
+            id,
+            original_filename,
+            stored_filename,
+            file_type,
+            uploaded_at
+        FROM documents
+        WHERE id = %s
+        AND user_id = %s
+        """,
+        (document_id, user_id),
+    )
+
+    document = cursor.fetchone()
+
+    cursor.close()
+
+    # Document does not exist or belongs to another user
+    if document is None:
+        abort(404)
+
+    file_path = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        document["stored_filename"],
+    )
+
+    # Database record exists, but physical file is missing
+    if not os.path.exists(file_path):
+        abort(404)
+
+    try:
+
+        extracted_text = extract_document_text(
+            file_path,
+            document["file_type"],
+        )
+
+    except (OSError, PdfReadError) as error:
+
+        app.logger.error(
+            "Text extraction failed for document %s: %s",
+            document_id,
+            error,
+        )
+
+        flash(
+            "The document could not be read.",
+            "error",
+        )
+
+        return redirect(url_for("documents"))
+
+    return render_template(
+        "document_detail.html",
+        document=document,
+        extracted_text=extracted_text,
+    )
 # Home-page route
 @app.route("/")
 def home():
