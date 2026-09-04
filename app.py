@@ -115,18 +115,25 @@ def extract_document_text(file_path, file_type):
         return "\n\n".join(extracted_pages)
 
     return ""
+
 @app.route("/documents/<int:document_id>/view")
 def view_document(document_id):
 
-    # Protect the page from users who are not logged in
+    # User must be logged in
     if "user_id" not in session:
         return redirect(url_for("login"))
 
     user_id = session["user_id"]
 
+    # Read the search word from the URL
+    search = request.args.get(
+        "search",
+        "",
+    ).strip()
+
     cursor = db.cursor(dictionary=True)
 
-    # Find the document, but only if it belongs to this user
+    # Find only a document belonging to this user
     cursor.execute(
         """
         SELECT
@@ -146,7 +153,6 @@ def view_document(document_id):
 
     cursor.close()
 
-    # Document does not exist or belongs to another user
     if document is None:
         abort(404)
 
@@ -155,7 +161,6 @@ def view_document(document_id):
         document["stored_filename"],
     )
 
-    # Database record exists, but physical file is missing
     if not os.path.exists(file_path):
         abort(404)
 
@@ -181,12 +186,37 @@ def view_document(document_id):
 
         return redirect(url_for("documents"))
 
+    # This list will contain matching lines
+    search_results = []
+
+    if search:
+
+        search_lower = search.lower()
+
+        # Divide the complete text into separate lines
+        document_lines = extracted_text.splitlines()
+
+        for line in document_lines:
+
+            clean_line = line.strip()
+
+            if (
+                clean_line
+                and search_lower in clean_line.lower()
+            ):
+                search_results.append(clean_line)
+
+            # Display a maximum of 20 results
+            if len(search_results) == 20:
+                break
+
     return render_template(
         "document_detail.html",
         document=document,
         extracted_text=extracted_text,
+        search=search,
+        search_results=search_results,
     )
-# Home-page route
 @app.route("/")
 def home():
 

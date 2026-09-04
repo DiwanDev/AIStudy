@@ -619,3 +619,69 @@ footer {
 .view-button:hover {
     background-color: #dddddd;
 }
+/* ========================================
+   DOCUMENT SEARCH
+======================================== */
+
+.document-search-card {
+    padding: 25px;
+    margin-bottom: 25px;
+    background-color: white;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+}
+
+.document-search-card h2 {
+    margin-bottom: 15px;
+}
+
+.document-search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.document-search-form input {
+    flex: 1;
+    padding: 11px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.document-search-form button {
+    padding: 11px 18px;
+    color: white;
+    background-color: #4f46e5;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.document-search-form button:hover {
+    background-color: #3730a3;
+}
+
+.search-results {
+    margin-top: 25px;
+}
+
+.search-results h3 {
+    margin-bottom: 10px;
+}
+
+.search-result-item {
+    padding: 15px;
+    margin-top: 10px;
+    background-color: #f5f5ff;
+    border-left: 4px solid #4f46e5;
+    border-radius: 4px;
+    line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+    .document-search-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

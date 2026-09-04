@@ -47,7 +47,84 @@
 
     </div>
 
+    <div class="document-search-card">
 
+    <h2>Search This Document</h2>
+
+    <form
+        action="{{ url_for(
+            'view_document',
+            document_id=document.id
+        ) }}"
+        method="GET"
+        class="document-search-form"
+    >
+
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Enter a word or topic"
+            required
+        >
+
+        <button type="submit">
+            Search
+        </button>
+
+        {% if search %}
+
+            <a
+                href="{{ url_for(
+                    'view_document',
+                    document_id=document.id
+                ) }}"
+                class="secondary-button"
+            >
+                Clear
+            </a>
+
+        {% endif %}
+
+    </form>
+
+
+    {% if search %}
+
+        <div class="search-results">
+
+            <h3>
+                Results for "{{ search }}"
+            </h3>
+
+            {% if search_results %}
+
+                <p>
+                    Showing {{ search_results | length }}
+                    matching result(s).
+                </p>
+
+                {% for result in search_results %}
+
+                    <div class="search-result-item">
+                        {{ result }}
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>
+                    No matching text was found.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</div>
     <div class="extracted-text-card">
 
         <h2>Extracted Text</h2>
