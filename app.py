@@ -153,37 +153,86 @@ def login():
 @app.route("/dashboard")
 def dashboard():
 
+    # Check whether the user is logged in
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    # Get the logged-in user's ID from the session
+    user_id = session["user_id"]
+
+    # Create a cursor that returns rows as dictionaries
     cursor = db.cursor(dictionary=True)
 
+    # Count all documents belonging to this user
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM documents
+        WHERE user_id = %s
+        """,
+        (user_id,),
+    )
+
+    total_result = cursor.fetchone()
+    total_documents = total_result["total"]
+
+    # Count only PDF documents
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM documents
+        WHERE user_id = %s
+        AND file_type = 'pdf'
+        """,
+        (user_id,),
+    )
+
+    pdf_result = cursor.fetchone()
+    total_pdfs = pdf_result["total"]
+
+    # Count only TXT documents
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM documents
+        WHERE user_id = %s
+        AND file_type = 'txt'
+        """,
+        (user_id,),
+    )
+
+    txt_result = cursor.fetchone()
+    total_text_files = txt_result["total"]
+
+    # Get the user's five most recently uploaded documents
     cursor.execute(
         """
         SELECT
             id,
-            name,
-            email,
-            created_at
-        FROM users
-        WHERE id = %s
+            original_filename,
+            file_type,
+            uploaded_at
+        FROM documents
+        WHERE user_id = %s
+        ORDER BY uploaded_at DESC
+        LIMIT 5
         """,
-        (session["user_id"],),
+        (user_id,),
     )
 
-    user = cursor.fetchone()
+    recent_documents = cursor.fetchall()
 
+    # Close the cursor after completing all queries
     cursor.close()
 
-    if user is None:
-
-        session.clear()
-
-        return redirect(url_for("login"))
-
+    # Send all values to dashboard.html
     return render_template(
         "dashboard.html",
-        user=user,
+        user_name=session.get("user_name"),
+        total_documents=total_documents,
+        total_pdfs=total_pdfs,
+        total_text_files=total_text_files,
+        recent_documents=recent_documents,
     )
 @app.route("/logout", methods=["POST"])
 def logout():

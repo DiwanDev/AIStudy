@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-
 {% block title %}
 Dashboard | AIStudy
 {% endblock %}
@@ -10,70 +9,100 @@ Dashboard | AIStudy
 
 <section class="dashboard-section">
 
-    <div class="dashboard-header">
+    <div class="dashboard-heading">
 
-        <p class="label">Student Dashboard</p>
+        <div>
+            <h1>Welcome, {{ user_name }}</h1>
 
-        <h1>
-            Welcome, {{ user.name }}
-        </h1>
+            <p>
+                View your study documents and learning activity.
+            </p>
+        </div>
 
-        <p>
-            You are logged in as {{ user.email }}.
-        </p>
+        <a
+            href="{{ url_for('documents') }}"
+            class="primary-button"
+        >
+            Manage Documents
+        </a>
 
     </div>
 
-    <div class="dashboard-grid">
 
-        <div class="dashboard-card">
+    <div class="statistics-grid">
 
-    <h2>Documents</h2>
-
-    <p class="dashboard-number">
-        0
-    </p>
-
-    <p>
-        Upload your first study document.
-    </p>
-
-    <a
-        href="{{ url_for('documents') }}"
-        class="card-link"
-    >
-        Manage Documents
-    </a>
-
-</div>
-
-        <div class="dashboard-card">
-
-            <h2>Quizzes</h2>
-
-            <p class="dashboard-number">
-                0
-            </p>
-
-            <p>
-                Your generated quizzes will appear here.
-            </p>
-
+        <div class="statistic-card">
+            <h2>{{ total_documents }}</h2>
+            <p>Total Documents</p>
         </div>
 
-        <div class="dashboard-card">
-
-            <h2>Average Score</h2>
-
-            <p class="dashboard-number">
-                0%
-            </p>
-
-            <p>
-                Complete quizzes to track your progress.
-            </p>
-
+        <div class="statistic-card">
+            <h2>{{ total_pdfs }}</h2>
+            <p>PDF Documents</p>
         </div>
+
+        <div class="statistic-card">
+            <h2>{{ total_text_files }}</h2>
+            <p>Text Documents</p>
+        </div>
+
+    </div>
+
+
+    <div class="recent-section">
+
+        <h2>Recently Uploaded</h2>
+
+        {% if recent_documents %}
+
+            {% for document in recent_documents %}
+
+                <div class="recent-document">
+
+                    <div>
+                        <h3>{{ document.original_filename }}</h3>
+
+                        <p>
+                            Type: {{ document.file_type | upper }}
+                        </p>
+
+                        <p>
+                            Uploaded: {{ document.uploaded_at }}
+                        </p>
+                    </div>
+
+                    <a
+                        href="{{ url_for(
+                            'download_document',
+                            document_id=document.id
+                        ) }}"
+                        class="small-button"
+                    >
+                        Download
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-message">
+
+                <p>
+                    You have not uploaded any documents yet.
+                </p>
+
+                <a
+                    href="{{ url_for('documents') }}"
+                    class="primary-button"
+                >
+                    Upload Your First Document
+                </a>
+
+            </div>
+
+        {% endif %}
 
     </div>
 
